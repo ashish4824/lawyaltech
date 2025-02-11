@@ -1,5 +1,5 @@
 const express = require('express');
-const { updateUserPoints, normalizeUserId, TaskType } = require('../userPoints');
+const { updateUserPoints, normalizeUserId, TaskType } = require('../controllers/userPointsController');
 const mongoose = require('mongoose');
 const { logger } = require('ashish_logger-middleware');
 
@@ -59,11 +59,9 @@ router.get("/users/dashboard/summary", asyncHandler(async (req, res) => {
         }
       ]);
 
-      return res.json(aggregateSummary[0] || {
-        totalUsers: 0,
-        totalPoints: 0,
-        averagePoints: 0,
-        topUsers: []
+      return res.status(200).json({
+        status: 'success',
+        data: aggregateSummary[0] || {}
       });
     }
 
@@ -452,5 +450,7 @@ router.post("/users/update-points", asyncHandler(async (req, res) => {
     });
   }
 }));
+
+console.log('UserPoints Routes Loaded:', router.stack.map(r => r.route.path));
 
 module.exports = router;

@@ -104,48 +104,79 @@ npm start
 npm run dev
 ```
 
-## Point System Logic
+## Point System and Dashboard Implementation
 
-### Point Calculation Strategy
-The system implements a multi-tiered, configurable point allocation mechanism:
+## Point Calculation Logic
 
-#### Base Points
-- Regular Tasks: 10 points
-- High-Priority Tasks: 20 points
-- Activities: 15 points
+The point system is designed to reward users for various activities with a flexible and scalable approach.
 
-#### Milestone Bonuses
-1. Task Completion Milestones
-   - Every 5 tasks completed: +50 bonus points
-   - Every 3 high-priority tasks: +30 bonus points
+### Activity Types
+- Learning
+- Project Completion
+- Challenges
+- Collaboration
+- Milestones
 
-2. Total Points Milestone
-   - Reaching 100 total points: Additional 100 points bonus
+### Difficulty Levels
+- Easy: Basic activities
+- Medium: Intermediate complexity
+- Hard: Advanced tasks
+- Expert: Highly complex activities
 
-### Calculation Mechanism
-```javascript
-function calculatePoints(taskType, userProgress) {
-  let points = BASE_POINTS[taskType];
-  
-  // Milestone bonus logic
-  if (isMilestoneReached(taskType, userProgress)) {
-    points += MILESTONE_BONUS[taskType];
-  }
-  
-  // Grand milestone bonus
-  if (isGrandMilestoneReached(userProgress.totalPoints)) {
-    points += GRAND_MILESTONE_BONUS;
-  }
-  
-  return points;
+### Base Point Calculation
+Points are calculated based on two primary factors:
+1. Activity Type
+2. Difficulty Level
+
+Example Point Ranges:
+- Learning (Easy): 10 points
+- Learning (Expert): 100 points
+- Project (Easy): 20 points
+- Project (Expert): 250 points
+
+### Bonus Points
+Additional points are awarded for:
+- Consistent daily activity (streak bonus)
+- Completing milestone activities
+
+## Dashboard Endpoints
+
+### GET /api/points/users/dashboard/summary
+Returns an overview of user's point system:
+- Total points
+- Activity progress by type
+- Percentage distribution
+
+### GET /api/points/users/dashboard/details
+Provides comprehensive activity statistics:
+- Recent activities
+- Points breakdown by difficulty
+- Activity type distribution
+
+### POST /api/activity/activity
+Record a new user activity with points calculation
+
+## Example Request
+```json
+{
+  "userId": "user123",
+  "activityType": "project",
+  "difficultyLevel": "medium",
+  "description": "Completed backend API implementation"
 }
 ```
+
+## Evaluation Criteria
+- Logical point calculation
+- Scalable design
+- Real-time updates
+- Comprehensive tracking
 
 ## API Endpoints
 
 ### 1. Dashboard Summary
 ```
-GET /api/users/dashboard/summary
+GET /api/points/users/dashboard/summary
 ```
 #### Query Parameters
 - `userId` (optional): Specific user's dashboard
@@ -156,102 +187,171 @@ GET /api/users/dashboard/summary
 1. User-Specific Dashboard
 ```json
 {
-  "userId": "user123",
-  "totalPoints": 100,
-  "progress": {
-    "tasksCompleted": 5,
-    "highPriorityTasksCompleted": 2,
-    "activitiesCompleted": 3
-  },
-  "ranking": 15
+  "status": "success",
+  "data": {
+    "totalPoints": 250,
+    "activityProgress": [
+      {
+        "type": "learning",
+        "activities": 5,
+        "points": 100,
+        "percentage": "40.00"
+      },
+      {
+        "type": "project",
+        "activities": 3,
+        "points": 150,
+        "percentage": "60.00"
+      }
+    ]
+  }
 }
 ```
 
 2. Aggregate Summary
 ```json
 {
-  "totalUsers": 500,
-  "totalPoints": 50000,
-  "averagePoints": 100.50,
-  "topUsers": [...]
+  "status": "success", 
+  "data": {
+    "totalUsers": 500,
+    "totalPoints": 50000,
+    "averagePoints": 100.50,
+    "topUsers": [...]
+  }
 }
 ```
 
 ### 2. Dashboard Details
 ```
-GET /api/users/dashboard/details
+GET /api/points/users/dashboard/details
 ```
 #### Query Parameters
-- `userId` (optional): Specific user's details
-- `detailed` (optional): Get comprehensive breakdown
-- `timeframe` (optional): Filter by time period
+- `userId` (required): Specific user's details
+- `startDate` (optional): Filter activities from this date
+- `endDate` (optional): Filter activities up to this date
 
-#### Response Scenarios
-1. User Details
+#### Response Example
 ```json
 {
-  "userId": "user123",
-  "totalPoints": 100,
-  "progress": {
-    "tasksCompleted": 5,
-    "highPriorityTasksCompleted": 2,
-    "activitiesCompleted": 3
-  }
-}
-```
-
-2. Detailed Breakdown
-```json
-{
-  "userId": "user123",
-  "totalPoints": 100,
-  "detailedBreakdown": {
-    "taskTypes": {
-      "task": { "total": 5, "points": 50 },
-      "highPriorityTask": { "total": 2, "points": 40 }
-    },
-    "milestones": {
-      "taskMilestone": { "reached": 1, "bonusPoints": 50 }
+  "status": "success",
+  "data": {
+    "recentActivities": [
+      {
+        "activityType": "project",
+        "difficultyLevel": "medium",
+        "points": 50,
+        "timestamp": "2025-02-11T18:00:00Z"
+      }
+    ],
+    "stats": {
+      "totalActivities": 10,
+      "pointsByDifficulty": {
+        "easy": 100,
+        "medium": 200,
+        "hard": 150
+      },
+      "activityTypeBreakdown": {
+        "learning": 5,
+        "project": 3,
+        "challenge": 2
+      }
     }
   }
 }
 ```
 
-### 3. Update Points
+### 3. Record Activity
 ```
-POST /api/users/update
+POST /api/activity/activity
 ```
 #### Request Body
 ```json
 {
   "userId": "user123",
-  "taskType": "task" | "highPriorityTask" | "activity"
+  "activityType": "project",
+  "difficultyLevel": "medium",
+  "description": "Completed backend API implementation"
 }
 ```
 
-### 4. Create User
-```
-POST /api/users/create
-```
-#### Request Body
+#### Response Example
 ```json
 {
-  "userId": "unique_user_id",
-  "username": "johndoe",
-  "email": "john.doe@example.com",
-  "initialPoints": 0
+  "status": "success",
+  "data": {
+    "activity": {
+      "userId": "user123",
+      "activityType": "project",
+      "difficultyLevel": "medium",
+      "points": 50
+    },
+    "basePoints": 50,
+    "bonusPoints": 25,
+    "totalPoints": 75
+  }
 }
 ```
 
-## Supported Task Types
-- `task`: Regular tasks (10 points)
-- `highPriorityTask`: High-priority tasks (20 points)
-- `activity`: General activities (15 points)
+### 4. Get User Activities
+```
+GET /api/activity/activities
+```
+#### Query Parameters
+- `userId` (required): User ID to fetch activities for
+- `activityType` (optional): Filter by specific activity type
+- `difficultyLevel` (optional): Filter by difficulty level
+- `startDate` (optional): Start date for activity filter
+- `endDate` (optional): End date for activity filter
+- `limit` (optional, default: 50): Number of activities per page
+- `page` (optional, default: 1): Page number for pagination
+
+#### Response Example
+```json
+{
+  "status": "success",
+  "data": {
+    "activities": [
+      {
+        "userId": "user123",
+        "activityType": "project",
+        "difficultyLevel": "medium",
+        "points": 50,
+        "description": "Completed backend API",
+        "timestamp": "2025-02-11T18:00:00Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 3,
+      "totalActivities": 120,
+      "limit": 50
+    }
+  }
+}
+```
+
+#### Example Request
+```
+GET /api/activity/activities?userId=user123&activityType=project&startDate=2025-01-01&endDate=2025-02-28&page=1&limit=10
+```
+
+## Supported Activity Types
+- `learning`: Educational activities
+- `project`: Project completions
+- `challenge`: Coding challenges
+- `collaboration`: Team collaborations
+- `milestone`: Major achievements
+
+## Difficulty Levels
+- `easy`: Basic activities
+- `medium`: Intermediate complexity
+- `hard`: Advanced tasks
+- `expert`: Highly complex activities
 
 ## Bonus Point Rules
-- Every 5 tasks: +50 points
-- Every 3 high-priority tasks: +30 points
-- Reaching 100 total points: +100 points
+- Streak Bonus: 50 points per week of consistent activity
+- Milestone Bonus: 100 points per milestone activity
+- Difficulty-based point scaling
 
 ## Performance Considerations
 - Indexed database queries

@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const winston = require('winston');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const userPointsRoutes = require('./routes/userPointsRoutes');
+const userPointsRoutes = require('./src/routes/userPointsRoutes');
+const userActivityRoutes = require('./src/routes/userActivityRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -38,12 +39,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 // Use routes
-app.use('/api', userPointsRoutes);
+app.use('/api/points', userPointsRoutes);
+app.use('/api/activity', userActivityRoutes);
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000, 
   socketTimeoutMS: 45000, 
 })
