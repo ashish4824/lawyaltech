@@ -3,6 +3,29 @@
 ## Project Overview
 A scalable and flexible points tracking system designed to reward users for completing various tasks and activities, with advanced dashboard capabilities and comprehensive point calculation logic.
 
+## Project Structure
+
+```
+layler-backend/
+│
+├── src/
+│   ├── routes/           # Express route definitions
+│   ├── controllers/      # Business logic and request handling
+│   ├── models/           # Mongoose data models
+│   ├── middleware/       # Custom middleware functions
+│   ├── config/           # Configuration files
+│   └── utils/            # Utility functions
+│
+├── public/               # Static files
+├── logs/                 # Application logs
+├── tests/                # Unit and integration tests
+│
+├── .env                  # Environment variables
+├── .gitignore            # Git ignore file
+├── index.js              # Application entry point
+└── package.json          # Project dependencies and scripts
+```
+
 ## Technical Architecture
 - **Backend**: Node.js with Express
 - **Database**: MongoDB with Mongoose ORM
@@ -14,8 +37,35 @@ A scalable and flexible points tracking system designed to reward users for comp
 
 ## Prerequisites
 - Node.js (v14 or later)
+- npm or Yarn
 - MongoDB (v4 or later)
-- npm (v6 or later)
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file with necessary environment variables
+
+4. Run the application:
+   ```bash
+   # Development mode
+   npm run dev
+
+   # Production mode
+   npm start
+   ```
+
+## Scripts
+
+- `npm start`: Run the application
+- `npm run dev`: Run with nodemon for development
+- `npm test`: Run tests
+- `npm run lint`: Check code quality
+- `npm run lint:fix`: Automatically fix linting issues
 
 ## MongoDB Setup
 1. Install MongoDB Community Edition
@@ -33,13 +83,6 @@ A scalable and flexible points tracking system designed to reward users for comp
 
    # Linux
    sudo systemctl start mongod
-   ```
-
-## Installation Steps
-1. Clone the repository
-2. Install dependencies
-   ```bash
-   npm install
    ```
 
 ## Environment Configuration
