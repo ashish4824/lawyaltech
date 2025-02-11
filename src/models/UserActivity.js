@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-
-// Enum for activity types
 const ActivityType = Object.freeze({
   LEARNING: 'learning',
   PROJECT: 'project',
@@ -8,8 +6,6 @@ const ActivityType = Object.freeze({
   COLLABORATION: 'collaboration',
   MILESTONE: 'milestone'
 });
-
-// Enum for difficulty levels
 const DifficultyLevel = Object.freeze({
   EASY: 'easy',
   MEDIUM: 'medium', 
@@ -94,12 +90,8 @@ UserActivitySchema.statics.calculatePoints = function(activityType, difficultyLe
 
   return basePoints[activityType][difficultyLevel] || 0;
 };
-
-// Bonus point calculation for streaks and milestones
 UserActivitySchema.statics.calculateBonusPoints = async function(userId) {
   const activities = await this.find({ userId });
-  
-  // Streak bonus
   const dailyActivities = activities.reduce((acc, activity) => {
     const date = activity.timestamp.toISOString().split('T')[0];
     acc[date] = (acc[date] || 0) + 1;
@@ -107,9 +99,7 @@ UserActivitySchema.statics.calculateBonusPoints = async function(userId) {
   }, {});
 
   const streakDays = Object.keys(dailyActivities).length;
-  const streakBonus = Math.floor(streakDays / 7) * 50; // 50 bonus points per week of consistent activity
-
-  // Milestone bonus
+  const streakBonus = Math.floor(streakDays / 7) * 50; 
   const milestoneActivities = activities.filter(a => a.activityType === ActivityType.MILESTONE);
   const milestoneBonus = milestoneActivities.length * 100;
 

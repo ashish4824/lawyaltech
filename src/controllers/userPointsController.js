@@ -111,15 +111,13 @@ const updateUserPoints = async (userId, taskType) => {
   }
 
   try {
-    // Use findOneAndUpdate with atomic operations
+   
     const updateOperations = {
       $inc: {
-        totalPoints: 0, // Placeholder to trigger update
+        totalPoints: 0, 
       },
       $set: {}
     };
-
-    // Increment task-specific counter
     switch (taskType) {
       case TaskType.TASK:
         updateOperations.$inc.tasksCompleted = 1;
@@ -131,8 +129,6 @@ const updateUserPoints = async (userId, taskType) => {
         updateOperations.$inc.activitiesCompleted = 1;
         break;
     }
-
-    // Find the user or create if not exists
     const user = await User.findOneAndUpdate(
       { userId: normalizeUserId(userId) }, 
       { $setOnInsert: { userId: normalizeUserId(userId) } }, 
@@ -141,11 +137,8 @@ const updateUserPoints = async (userId, taskType) => {
         new: true 
       }
     );
-
-    // Calculate points after finding/creating user
     const pointsEarned = calculatePoints(user, taskType);
 
-    // Atomic update of points
     const updatedUser = await User.findOneAndUpdate(
       { userId: normalizeUserId(userId) },
       { 

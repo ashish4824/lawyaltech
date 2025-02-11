@@ -159,7 +159,7 @@ Record a new user activity with points calculation
 ## Example Request
 ```json
 {
-  "userId": "user123",
+  "userId": "Webster30",
   "activityType": "project",
   "difficultyLevel": "medium",
   "description": "Completed backend API implementation"

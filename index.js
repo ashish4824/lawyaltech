@@ -1,56 +1,26 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const winston = require('winston');
+// const winston = require('winston');
+const { logger } = require('ashish_logger-middleware');
+
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userPointsRoutes = require('./src/routes/userPointsRoutes');
 const userActivityRoutes = require('./src/routes/userActivityRoutes');
-
-// Load environment variables
 dotenv.config();
-
-// Configure logging
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
-});
-
-// Add console transport if not in production
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
-  }));
-}
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Middleware
 app.use(cors({origin: '*'}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Import routes
-// Use routes
 app.use('/api/points', userPointsRoutes);
 app.use('/api/activity', userActivityRoutes);
-
-// Database connection
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000, 
   socketTimeoutMS: 45000, 
 })
 .then(() => logger.info('Connected to MongoDB'))
 .catch((err) => logger.error('MongoDB connection error:', err));
-
-// Global error handler
 app.use((err, req, res, next) => {
   logger.error(err.stack);
   res.status(err.status || 500).json({

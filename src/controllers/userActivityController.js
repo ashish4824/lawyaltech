@@ -2,7 +2,6 @@ const { UserActivity, ActivityType, DifficultyLevel } = require('../models/UserA
 const mongoose = require('mongoose');
 
 class UserActivityController {
-  // Record a new user activity and calculate points
   static async recordActivity(req, res) {
     try {
       const { 
@@ -12,7 +11,6 @@ class UserActivityController {
         description 
       } = req.body;
 
-      // Validate input
       if (!userId || !activityType) {
         return res.status(400).json({
           status: 'error',
@@ -20,15 +18,11 @@ class UserActivityController {
         });
       }
 
-      // Ensure userId is a string
+   
       const userIdString = String(userId);
-
-      // Calculate base points
       const basePoints = UserActivity.calculatePoints(activityType, difficultyLevel);
-
-      // Create activity record
       const activity = new UserActivity({
-        userId: userIdString,  // Convert to string
+        userId: userIdString,  
         activityType,
         difficultyLevel,
         points: basePoints,
@@ -37,10 +31,10 @@ class UserActivityController {
 
       await activity.save();
 
-      // Calculate bonus points
+
       const bonusPoints = await UserActivity.calculateBonusPoints(userIdString);
 
-      // Update total points for the user
+  
       const totalPoints = basePoints + bonusPoints;
 
       res.status(201).json({
@@ -62,7 +56,7 @@ class UserActivityController {
     }
   }
 
-  // Get dashboard summary
+
   static async getDashboardSummary(req, res) {
     try {
       const { userId } = req.query;
@@ -74,7 +68,7 @@ class UserActivityController {
         });
       }
 
-      // Aggregate activities by type
+
       const activitySummary = await UserActivity.aggregate([
         { $match: { userId: userId } },
         {
@@ -86,10 +80,10 @@ class UserActivityController {
         }
       ]);
 
-      // Get total points across all activities
+  
       const totalPoints = activitySummary.reduce((sum, activity) => sum + activity.totalPoints, 0);
 
-      // Calculate progress percentages
+
       const progressBreakdown = activitySummary.map(activity => ({
         type: activity._id,
         activities: activity.totalActivities,
@@ -114,7 +108,7 @@ class UserActivityController {
     }
   }
 
-  // Get detailed activity statistics
+  
   static async getDashboardDetails(req, res) {
     try {
       const { userId, startDate, endDate } = req.query;
@@ -126,7 +120,7 @@ class UserActivityController {
         });
       }
 
-      // Build query with optional date filtering
+
       const query = { userId: userId };
       if (startDate && endDate) {
         query.timestamp = {
@@ -135,12 +129,10 @@ class UserActivityController {
         };
       }
 
-      // Fetch detailed activities
       const activities = await UserActivity.find(query)
         .sort({ timestamp: -1 })
-        .limit(50);  // Limit to prevent overwhelming response
+        .limit(50);  
 
-      // Detailed statistics
       const stats = {
         totalActivities: activities.length,
         pointsByDifficulty: {},
@@ -148,11 +140,8 @@ class UserActivityController {
       };
 
       activities.forEach(activity => {
-        // Points by difficulty
         stats.pointsByDifficulty[activity.difficultyLevel] = 
           (stats.pointsByDifficulty[activity.difficultyLevel] || 0) + activity.points;
-
-        // Activity type breakdown
         stats.activityTypeBreakdown[activity.activityType] = 
           (stats.activityTypeBreakdown[activity.activityType] || 0) + 1;
       });
@@ -174,7 +163,6 @@ class UserActivityController {
     }
   }
 
-  // Get user activities
   static async getUserActivities(req, res) {
     try {
       const { 
@@ -187,7 +175,6 @@ class UserActivityController {
         page = 1 
       } = req.query;
 
-      // Validate user ID
       if (!userId) {
         return res.status(400).json({
           status: 'error',
@@ -195,13 +182,10 @@ class UserActivityController {
         });
       }
 
-      // Build query object
       const query = { 
-        // Use string matching instead of ObjectId conversion
         userId: userId 
       };
 
-      // Optional filters
       if (activityType) {
         query.activityType = activityType;
       }
@@ -217,24 +201,20 @@ class UserActivityController {
         };
       }
 
-      // Pagination
       const pageNumber = parseInt(page, 10);
       const pageLimit = parseInt(limit, 10);
       const skip = (pageNumber - 1) * pageLimit;
 
-      // Fetch activities with pagination and sorting
       const activities = await UserActivity.find(query)
         .sort({ timestamp: -1 })
         .skip(skip)
         .limit(pageLimit);
 
-      // Count total matching activities for pagination info
       const totalActivities = await UserActivity.countDocuments(query);
 
-      // Calculate total pages
+
       const totalPages = Math.ceil(totalActivities / pageLimit);
 
-      // If no activities found, return informative response
       if (activities.length === 0) {
         return res.status(404).json({
           status: 'not_found',

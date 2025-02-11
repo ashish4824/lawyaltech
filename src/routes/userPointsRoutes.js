@@ -21,12 +21,10 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 router.get("/users/dashboard/summary", asyncHandler(async (req, res) => {
   const { 
-    userId,     // Optional user-specific query
-    aggregate,  // Optional flag for aggregate summary
-    top = 10    // Optional limit for top users
+    userId,     
+    aggregate,  
+    top = 10    
   } = req.query;
-
-  // Log incoming request with more context
   logger.info(`Dashboard Summary Request: ${userId || 'All Users'}`);
 
   try {
@@ -64,8 +62,6 @@ router.get("/users/dashboard/summary", asyncHandler(async (req, res) => {
         data: aggregateSummary[0] || {}
       });
     }
-
-    // Scenario 2: User-Specific Dashboard
     if (userId) {
       const user = await User.findOne({ 
         userId: normalizeUserId(userId) 
@@ -277,8 +273,6 @@ router.post("/users/update", asyncHandler(async (req, res) => {
     userId, 
     taskType 
   } = req.body;
-
-  // Log the incoming request details
   logger.info(`Points Update Request Received`, { 
     userId, 
     taskType,
@@ -308,11 +302,8 @@ router.post("/users/update", asyncHandler(async (req, res) => {
   }
 
   try {
-    // Update user points
     const pointsUpdate = await updateUserPoints(userId, taskType);
-
     logger.info(`Points updated for user ${userId}: ${pointsUpdate.pointsEarned} points`);
-
     res.status(200).json({
       message: "Points updated successfully",
       ...pointsUpdate
@@ -410,8 +401,6 @@ router.post("/users/update-points", asyncHandler(async (req, res) => {
     userId, 
     taskType 
   } = req.body;
-
-  // Validate input
   if (!userId) {
     return res.status(400).json({ 
       error: { 
@@ -431,7 +420,6 @@ router.post("/users/update-points", asyncHandler(async (req, res) => {
   }
 
   try {
-    // Update user points
     const pointsUpdate = await updateUserPoints(userId, taskType);
 
     logger.info(`Points updated for user ${userId}: ${pointsUpdate.pointsEarned} points`);
