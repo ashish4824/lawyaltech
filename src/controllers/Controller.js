@@ -13,4 +13,5 @@ async function getContact(req ,res, next) {
     const contact = await Contact.find({});
     res.status(200).json({ message: 'Contact fetched successfully',contact: contact });
 }
+
 export { postContact, deleteContact, getContact };
