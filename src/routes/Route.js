@@ -2,8 +2,10 @@ import express from 'express';
 import { deleteContact, getContact, postContact } from '../controllers/Controller.js';
 import { PostWork,GetWork,deleteMany, updatWork, deleteById } from '../controllers/WorkController.js';
 import multer from 'multer';
+// import asyncHandler from '../Middleware/asyncHandler.js';
 const router = express.Router();
 const asyncHandler = (fn) => (req, res, next) => {
+  // console.log("Async Handler",req);
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 const upload = multer({ storage: multer.memoryStorage() });
