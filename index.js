@@ -24,6 +24,11 @@ app.get('/nonfiction', (req, res) => {
         res.status(200).json({ message: 'Nonfiction fetched successfully', data: nonfiction });
     });
 });
+app.delete('/nonfiction', (req, res) => {
+    Nonfiction.deleteMany().then(() => {
+        res.status(200).json({ message: 'Nonfiction deleted successfully' });
+    });
+});
 app.listen(4000, () => {
     console.log("Server is running on port http://localhost:4000");
 });
