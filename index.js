@@ -19,6 +19,11 @@ app.post('/nonfiction', (req, res) => {
     nonfiction.save();
     res.status(200).json({ message: 'Nonfiction created successfully' });
 });
+app.get('/nonfiction', (req, res) => {
+    Nonfiction.find().then(nonfiction => {
+        res.status(200).json({ message: 'Nonfiction fetched successfully', data: nonfiction });
+    });
+});
 app.listen(4000, () => {
     console.log("Server is running on port http://localhost:4000");
 });
