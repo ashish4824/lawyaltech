@@ -2,6 +2,7 @@ import express from 'express';
 import { deleteContact, getContact, postContact } from '../controllers/Controller.js';
 import { PostWork,GetWork,deleteMany, updatWork, deleteById } from '../controllers/WorkController.js';
 import multer from 'multer';
+import getNews from '../News/News.js';
 // import asyncHandler from '../Middleware/asyncHandler.js';
 const router = express.Router();
 const asyncHandler = (fn) => (req, res, next) => {
@@ -31,4 +32,5 @@ router.put('/work/:id', upload.fields([
   { name: "tags" },
 ]),asyncHandler(updatWork));
 router.delete('/work/:id', asyncHandler(deleteById));
+router.get('/news', asyncHandler(getNews));
 export default router;
